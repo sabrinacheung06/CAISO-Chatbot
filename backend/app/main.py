@@ -1,24 +1,11 @@
-import os
 from datetime import datetime
-
-import psycopg
-from psycopg.rows import dict_row
-from dotenv import load_dotenv
+from app.db import query
 from fastapi import FastAPI
+from dataclasses import asdict
+from app.operations.summary import summary_stats
 
-load_dotenv()
-DB_URL = os.getenv(
-    "DATABASE_URL",
-    "postgresql://caiso:caiso_dev@localhost:5432/caiso",
-)
 
 app = FastAPI(title="CAISO Assistant API")
-
-
-def query(sql: str, params: dict | None = None) -> list[dict]:
-    """Run a SQL query and return rows as a list of dictionaries."""
-    with psycopg.connect(DB_URL, row_factory=dict_row) as conn:
-        return conn.execute(sql, params).fetchall()
 
 
 @app.get("/api/health")
@@ -44,3 +31,7 @@ def get_lmp(node_id: str, market: str, start: datetime, end: datetime,
     """
     return query(sql, {"node_id": node_id, "market": market,
                        "start": start, "end": end, "limit": limit})
+
+@app.get("/api/analyze/summary")
+def api_summary(node_id: str, market: str, start: datetime, end: datetime):
+    return asdict(summary_stats(node_id, market, start, end))
