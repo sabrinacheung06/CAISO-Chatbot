@@ -15,7 +15,7 @@ CREATE TABLE lmp (
   ts_utc timestamptz NOT NULL,
   market text NOT NULL,
   node_id text NOT NULL REFERENCES node(node_id),
-  lmp numeric, energy numeric, congestion numeric, loss numeric,
+  lmp numeric, energy numeric, congestion numeric, loss numeric, ghg numeric,
   ingest_id bigint REFERENCES ingest_log(id),
   PRIMARY KEY (node_id, market, ts_utc)
 );
